@@ -1,7 +1,9 @@
+
 import java.io.*;
 import java.text.ParseException;
 
-public class Basket {
+public class Basket implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     protected String[] productName;
     protected int[] price;
@@ -19,6 +21,7 @@ public class Basket {
         this.price = price;
         this.prodAmount = prodAmount;
     }
+
 
     //Метод добавления в корзину продукта: количество и изменение цены в зависимости от добавленного количества
     public void addToCart(int productNum, int amount) {
@@ -40,54 +43,22 @@ public class Basket {
         System.out.println("Итого в корзине: " + sumProducts + " рублей.");
     }
 
-    //Метод сохранения корзины в текстовый файл
-    public void saveTxt(File textFile) throws IOException {
-        try (FileWriter out = new FileWriter(textFile);) {
-            for (String st : productName) {
-                out.write(st + "@");
-            }
-            out.write("\n");
-            for (int pr : price) {
-                out.write(pr + "@");
-            }
-            out.write("\n");
-            for (int amount : prodAmount) {
-                out.write(amount + "@");
-            }
 
+    public void saveBin(File file) {
+        try (FileOutputStream fos = new FileOutputStream(file);
+             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+            oos.writeObject(this);
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
         }
+
     }
 
-
-    //Метод выгрузки из карзины файла
-    public static Basket loadFromTxtFile(File textFile) {
-        try (BufferedReader br = new BufferedReader(new FileReader(textFile))) {
-            String productName = br.readLine(); //Массив названий
-            String price = br.readLine(); //Массив цен
-            String prodAmount = br.readLine(); //Массив количества
-
-            String[] productStr = productName.split("@");
-
-            //Преобразование строки с ценами в интовый массив
-            String[] priceStr = price.split("@");
-            int[] priceInt = new int[priceStr.length];
-            for (int i = 0; i < priceInt.length; i++) {
-                priceInt[i] = Integer.parseInt(priceStr[i]);
-            }
-
-            //Преобразуем строку количества продуктов в интовый массив
-            String[] amountStr = prodAmount.split("@");
-            int[] amountInt = new int[amountStr.length];
-            for (int i = 0; i < amountInt.length; i++) {
-                amountInt[i] = Integer.parseInt(amountStr[i]);
-            }
-
-            return new Basket(productStr, priceInt, amountInt);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public static Basket loadFromBinFile(File file) throws IOException, ClassNotFoundException {
+        //Откроем входной поток для чтения файла
+        FileInputStream fis = new FileInputStream(file);
+        ObjectInputStream ois = new ObjectInputStream(fis);
+        return (Basket) ois.readObject();
     }
 }

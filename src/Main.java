@@ -10,20 +10,16 @@ public class Main {
 
         Basket basket = new Basket(listOfProducts, prices);
 
-        int[] sum = {0, 0, 0, 0};
-        int[] count = {0, 0, 0, 0};
-
         int productNumber = 0;
         int productCount = 0;
-        int sumProducts = 0;
 
 
-        File basketFile = new File("basket.txt");
+        File basketFile = new File("basket.bin");
         Scanner scan = new Scanner(System.in);
         if (basketFile.exists()) {
             System.out.println("Загрузить корзину ENTER?");
             if (scan.nextLine().equals("")) {
-                basket = Basket.loadFromTxtFile(basketFile);
+                basket = Basket.loadFromBinFile(basketFile);
                 basket.printCart();
                 System.out.println(" ");
                 System.out.println("_______________________________________ ");
@@ -86,12 +82,9 @@ public class Main {
             }
 
             basket.addToCart(productNumber, productCount);
-            basket.saveTxt(basketFile);
+            basket.saveBin(basketFile);
             basket.printCart();
 
         }
-
-        //
-        // basket.printCart();
     }
 }
