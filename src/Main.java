@@ -1,3 +1,4 @@
+import java.io.File;
 import java.util.Scanner;
 
 public class Main {
@@ -7,12 +8,32 @@ public class Main {
         String[] listOfProducts = {"Молоко", "Соль", "Помидоры", "Оливки"};
         int[] prices = {70, 25, 100, 90};
 
+        Basket basket = new Basket(listOfProducts, prices);
+
         int[] sum = {0, 0, 0, 0};
         int[] count = {0, 0, 0, 0};
 
         int productNumber = 0;
         int productCount = 0;
         int sumProducts = 0;
+
+
+        File basketFile = new File("basket.txt");
+        Scanner scan = new Scanner(System.in);
+        if (basketFile.exists()) {
+            System.out.println("Загрузить корзину ENTER?");
+            if (scan.nextLine().equals("")) {
+                basket = Basket.loadFromTxtFile(basketFile);
+                basket.printCart();
+                System.out.println(" ");
+                System.out.println("_______________________________________ ");
+
+            } else {
+                basket = new Basket(listOfProducts, prices);
+            }
+        } else {
+            basket = new Basket(listOfProducts, prices);
+        }
 
 
         System.out.println("Список возможных товаров для покупки: ");
@@ -31,7 +52,7 @@ public class Main {
 
             String[] split = input.split(" ");
             if (split.length != 2) {
-                System.out.println("Ошибка ввода: Вы вввели 1 число или более 2 чисел =(");
+                System.out.println("Ошибка ввода: Вы ввели 1 число или более 2 чисел =(");
                 continue;
             }
 
@@ -52,6 +73,7 @@ public class Main {
 
             String b = split[1]; //после пробела, чтобы получить количество
             try {
+
                 productCount = Integer.parseInt(b);
             } catch (NumberFormatException e) {
                 System.out.println("Ошибка ввода: Вы ввели не число. Для корректной работы программы введите число!");
@@ -63,19 +85,13 @@ public class Main {
                 continue;
             }
 
-            sum[productNumber] += prices[productNumber] * productCount;
-            count[productNumber] += productCount;
+            basket.addToCart(productNumber, productCount);
+            basket.saveTxt(basketFile);
+            basket.printCart();
+
         }
 
-        System.out.println(" ");
-        System.out.println("Ваша корзина:");
-
-        for (int i = 0; i < listOfProducts.length; i++) {
-            if (count[i] != 0) {
-                System.out.println(listOfProducts[i] + " " + count[i] + " шт., " + prices[i] + " руб., " + sum[i] + " рублей в сумме.");
-            }
-            sumProducts += sum[i];
-        }
-        System.out.println("Итого: " + sumProducts + " рублей.");
+        //
+        // basket.printCart();
     }
 }
